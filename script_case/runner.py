@@ -3,7 +3,8 @@ import unittest
 import time
 import os
 import logging
-from HTMLTestRunner import HTMLTestRunner
+#from HTMLTestRunner import HTMLTestRunner
+from src.framework.HTMLTestRunner import HTMLTestRunner
 import shutil
 
 # 获取项目的根目录

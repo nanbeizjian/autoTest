@@ -5,8 +5,7 @@ import string
 import re
 import time
 from public import *
-from src.framework.logger import Logger
-logger = Logger("XXXXX页面").getlog()
+
 
 class mySSH:
     def __init__(self,HOST='',PORT='22',USERNAME='root',PASSWORD='system',Flag='chan',TimeOUT='10'):
@@ -43,8 +42,8 @@ class mySSH:
                 time.sleep(0.5)
                 print self.chan.recv(65535).decode('utf-8')
         except Exception,exce:
-            logger.error(exce)
-            logger.error("can not open host")
+            log_print(exce)
+            log_print("can not open host")
             if self.trans !='':
                 self.trans.close()
             if self.chan !='':
@@ -69,7 +68,7 @@ class mySSH:
             try:
                 time.sleep(0.3)
                 msg = self.chan.recv(65535)
-                #logger.error(msg)
+                #log_print(msg)
                 mre=re.compile("---more---")
                 wait=re.compile(waitMsg)
                 result_more = mre.search(msg)
@@ -105,15 +104,15 @@ class mySSH:
                 re_result=regex.findall(self.re_msg)
                 if len(re_result) !=0:
                     raise Exception,self.re_msg
-                logger.error(self.re_msg)
+                log_print(self.re_msg)
             else:
                 # chan模式执行命令
                 self.chan_send_keys(sendMsg,waitMsg,timeout)
-                logger.error(self.re_msg)
+                log_print(self.re_msg)
         except Exception,exce:
-            logger.error(exce)
-            logger.error(self.re_msg)
-            logger.error("execute command Exception")
+            log_print(exce)
+            log_print(self.re_msg)
+            log_print("execute command Exception")
             return False,self.re_msg
         return True,self.re_msg
 
@@ -127,11 +126,11 @@ class mySSH:
         re_result=regex.findall(self.re_msg)
         if re_result:
             msg = "find "+findStr+' successful'
-            logger.error(msg)
+            log_print(msg)
             return True,self.re_msg
         else:
             msg="can't find "+findStr+" in echo"
-            logger.error(msg)
+            log_print(msg)
             return False,self.re_msg
 
     def find_command_not_contain(self,sendMsg,waitStr,not_findStr,timew='2'):
@@ -142,25 +141,25 @@ class mySSH:
             time.sleep(timewait)
             echo_info=stdout.read()
         except Exception,exce:
-            logger.error(exce)
-            logger.error("execute command Exception")
+            log_print(exce)
+            log_print("execute command Exception")
             return False
-        logger.error(echo_info)
+        log_print(echo_info)
         regex = re.compile(not_findStr)
         re_result=regex.findall(echo_info)
         if re_result:
             msg = "find \""+not_findStr+'\"in echo,error!'
-            logger.error(msg)
+            log_print(msg)
             return False
         else:
             msg="have not find \""+not_findStr+"\" in echo,successful"
-            logger.error(msg)
+            log_print(msg)
             return True
 
     #下发一条命令从返回值查找是否存在多关键字
     def find_command_Multi(self,sendMsg,waitMsg,FINDSTR_str_T,A_TIMEOUT='10',Multi_FLAG='1',NUM='1',order_flag='0'):
         msg = '***********find_command_Multi function*************'
-        logger.error(msg)
+        log_print(msg)
         tmp_num = 1
         TIMEOUT = string.atoi(A_TIMEOUT)
         num = string.atoi(NUM)
@@ -171,11 +170,11 @@ class mySSH:
             if order_flag=='1':
                 re_result=True
                 Find_str=FINDSTR_str_T.split(' ')
-                logger.error('Find all str:'+str(Find_str))
+                log_print('Find all str:'+str(Find_str))
                 for strj in Find_str:
                     #regex = re.compile(strj)
                     tmp_result = re.findall(strj,self.re_msg,re.S)
-                    logger.error('Find single str:'+str(tmp_result))
+                    log_print('Find single str:'+str(tmp_result))
                     if not tmp_result:
                         re_result=False
                         return False,self.re_msg
@@ -186,20 +185,20 @@ class mySSH:
                     re_result=re.findall(FINDSTR,self.re_msg)
             if re_result:
                 print_mes = "find this command "+FINDSTR_str_T
-                logger.error(print_mes)
+                log_print(print_mes)
                 return True,self.re_msg
             else:
                 tmp_num = tmp_num +1
                 if tmp_num>num:
                     print_mes = 'error: ' +FINDSTR_str_T + ' not find'
-                    logger.error(print_mes)
+                    log_print(print_mes)
                     self.error_NG= print_mes
                     return False,self.re_msg
                 time.sleep(1)
 
     def Mult_find_str(self,FINDSTR_str_T):
         #msg = '*******Multi_find_str function********'
-        #logger.error(msg)
+        #log_print(msg)
         str_re =''
         FINDSTR_LIST=[]
         tmp_num = 0
@@ -216,7 +215,7 @@ class mySSH:
                 str_re = str_re + '.+' + str
             tmp_num = tmp_num +1
         print_msg = '******* str_re*******\n'+str_re
-        logger.error(print_msg)
+        log_print(print_msg)
         return str_re
 
     #获取命令回显信息中想要的任意值与阀值进行比较
@@ -251,34 +250,34 @@ class mySSH:
             try:
                 read_str=readfile(filename,keyword)
             except Exception,exec_str:
-                logger.error(exec_str)
+                log_print(exec_str)
                 return False
-            logger.error(read_str)
+            log_print(read_str)
             if len(read_str)>0:
                 #修改上次已存在的值
                 pre_value = read_str
                 msg="This time I modify the value"
-                logger.error(msg)
+                log_print(msg)
                 msg='Last time value is: '+pre_value
-                logger.error(msg)
+                log_print(msg)
                 msg='Now value is: '+g_vlist[0]
-                logger.error(msg)
+                log_print(msg)
                 try:
                     writefile(filename,keyword,g_vlist[0])
                 except Exception,exec_str:
-                    logger.error(exec_str)
+                    log_print(exec_str)
                     return False
             else :
                 keep_value = g_vlist[0]
-                logger.error('The first time to key : '+keep_value)
+                log_print('The first time to key : '+keep_value)
                 try:
                     writefile(filename,keyword,keep_value)
                 except Exception,exec_str:
-                    logger.error(exec_str)
+                    log_print(exec_str)
                     return False
             return True
         msg='False! the keep value should be named contain "keep" !'
-        logger.error(msg)
+        log_print(msg)
         return False
 
     def value_compare(self,sendMsg,waitMsg,FINDSTR_str_T,keyword='accomm_mem',comp_value='0',TIMEOUTSTR='2', queue='1',get_flag='END',delete_str='NULL',comp_flag='EQUAL' ,separator=''):
@@ -312,18 +311,18 @@ class mySSH:
             try:
                 read_str=readfile(filename,keyword)
             except Exception,exec_str:
-                logger.error(exec_str)
+                log_print(exec_str)
                 return False
-            logger.error(read_str)
+            log_print(read_str)
             if len(read_str)>0:
                 #偶数次使用get_value命令，则取出文件中上次保存的值，与此次比较，并仍将keyword的值置为10086
                 pre_value = read_str
                 msg='Now,this values is',g_vlist
-                logger.error(msg)
+                log_print(msg)
                 msg='The keep value is',pre_value
-                logger.error(msg)
+                log_print(msg)
                 msg = 'This time I compare'
-                logger.error(msg)
+                log_print(msg)
                 if keyword.find('date')>-1:
                     result_flag = self.date_cmp(g_vlist,comp_value,keyword,comp_flag,pre_value)
                 else:
@@ -332,13 +331,13 @@ class mySSH:
             #首次使用get_value命令
             else :
                 msg='False! You never keep '+keyword+" before"
-                logger.error(msg)
+                log_print(msg)
                 return False
         write_value = comp_value
         writefile(filename,keyword,write_value)
         #add by zhumingxing 20131227
         if keyword == "MIB_Flag":
-           logger.error("this is mib value compare opearate!")
+           log_print("this is mib value compare opearate!")
            comp_value = globle_dic.Ret_MIB_Node
         #end add
         result_flag = self.cmp_value(g_vlist,comp_value,keyword,comp_flag)
@@ -351,7 +350,7 @@ class mySSH:
         #print '***********find_msg fuction *************'
         split_str ='\r'
         list=[]
-        logger.error('in find_msg function 516: '+self.re_msg)
+        log_print('in find_msg function 516: '+self.re_msg)
         for str in self.re_msg.split(split_str):
             if str.find(FINDSTR_str)>-1:
                 list.append(str)
@@ -359,9 +358,9 @@ class mySSH:
 
     #根据表示符get_flag获取信息列表
     def value_list(self,list,get_flag):
-        logger.error ('**************value_list fuction*************')
+        log_print ('**************value_list fuction*************')
         #print list
-        #logger.error(list)
+        #log_print(list)
         tmp_list=[]
         if get_flag=='END':
             tmp_list.append(list[-1].strip())
@@ -374,19 +373,19 @@ class mySSH:
             get_flag=int(get_flag)
             if get_flag <= len(list):
                 tmp_list.append(list[get_flag -1 ])
-        logger.error(tmp_list)
+        log_print(tmp_list)
         return tmp_list
 
     #获取信息列表
     def get_value_list(self,list,queue,separator,del_str='NULL'):
-        logger.error ('***************get_value_list fuction')
+        log_print ('***************get_value_list fuction')
         #print '************list***********\n',list
         if separator == 'douhao':
             separator = ','
         re_list=[]
         tmp_str = ''
         msg = 'list is 257:'+str(list)
-        #logger.error(msg)
+        #log_print(msg)
         for i in list:
             print 'in for loop 445.'
             if queue == 'ALL':
@@ -398,7 +397,7 @@ class mySSH:
                 if len(x)>0:
                     tmp_list.append(x.strip())
             msg = '\n*********tmp_list*******\n'+str(tmp_list)
-            logger.error(msg)
+            log_print(msg)
             if len(tmp_list)>= string.atoi(queue):
                 print "471 queue is :",queue
                 if string.atoi(queue)>=0:
@@ -413,12 +412,12 @@ class mySSH:
 
                 re_list.append(tmp_str)
         msg = 're_list in get_value list is: '+str(re_list)
-        logger.error(msg)
+        log_print(msg)
         return re_list
 
     #value_comprae子函数，日期比较
     def date_cmp(self,list,comp_value,keyword,comp_flag,PreValue=''):
-        logger.error ('****************date_cmp fuction')
+        log_print ('****************date_cmp fuction')
         cmp_flag = True
         if len(list)<=0:
             cmp_flag = False
@@ -427,9 +426,9 @@ class mySSH:
 
         if comp_flag=='BIG':
             x = list[0]
-            logger.error('value of '+keyword+' is:'+x)
-            logger.error('comp_value is: '+comp_value)
-            logger.error('last time value  is: '+PreValue)
+            log_print('value of '+keyword+' is:'+x)
+            log_print('comp_value is: '+comp_value)
+            log_print('last time value  is: '+PreValue)
             if x.count('-') > 1:
                 lasttime = time.mktime(time.strptime(PreValue,"%Y-%m-%d %H:%M:%S"))
                 nowtime = time.mktime(time.strptime(x,"%Y-%m-%d %H:%M:%S"))
@@ -447,8 +446,8 @@ class mySSH:
 
             msg1 = 'the time-stamp of '+PreValue+' is: '+str(lasttime)
             msg2 = 'the time-stamp now '+x+' is: '+str(nowtime)
-            logger.error(msg1)
-            logger.error(msg2)
+            log_print(msg1)
+            log_print(msg2)
             if nowtime - lasttime > float(comp_value):
                 cmp_flag =False
                 self.error_NG ='NG  error: ' + keyword + ' get value ' + x.strip() +' is bigger then ' + comp_value
@@ -456,9 +455,9 @@ class mySSH:
 
         elif comp_flag=='SMALL':
             x=list[0]
-            logger.error('value of '+keyword+' is:'+x)
-            logger.error('comp_value is: '+comp_value)
-            logger.error('last time value  is: '+PreValue)
+            log_print('value of '+keyword+' is:'+x)
+            log_print('comp_value is: '+comp_value)
+            log_print('last time value  is: '+PreValue)
             if x.count('-') > 1:
                 lasttime = time.mktime(time.strptime(PreValue,"%Y-%m-%d %H:%M:%S"))
                 nowtime = time.mktime(time.strptime(x,"%Y-%m-%d %H:%M:%S"))
@@ -476,8 +475,8 @@ class mySSH:
 
                 msg1 = 'the time-stamp of '+PreValue+' is: '+str(lasttime)
                 msg2 = 'the time-stamp now '+x+' is: '+str(nowtime)
-                logger.error(msg1)
-                logger.error(msg2)
+                log_print(msg1)
+                log_print(msg2)
                 if nowtime - lasttime < float(comp_value):
                     cmp_flag = False
                     self.error_NG ='NG  error: ' + keyword + ' get value ' + x.strip() +' is smaller then ' + comp_value
@@ -494,8 +493,8 @@ class mySSH:
 
         if comp_flag=='BIG':
             for x in list:
-                logger.error('value of '+keyword+' is:'+x)
-                logger.error('comp_value is: '+comp_value)
+                log_print('value of '+keyword+' is:'+x)
+                log_print('comp_value is: '+comp_value)
                 if float(x.strip()) > float(comp_value):
                     cmp_flag = False
                     self.error_NG ='NG  error: ' + keyword + ' get value ' + x.strip() +' is bigger then ' + str(comp_value)
@@ -503,8 +502,8 @@ class mySSH:
                     return cmp_flag
         elif comp_flag=='SMALL':
             for x in list:
-                logger.error('value of '+keyword+' is:'+x)
-                logger.error('comp_value is: '+comp_value)
+                log_print('value of '+keyword+' is:'+x)
+                log_print('comp_value is: '+comp_value)
                 if float(x.strip()) < float(comp_value):
                     cmp_flag = False
                     self.error_NG ='NG  error: ' + keyword + ' get value ' + x.strip() +' is smaller then ' + str(comp_value)
@@ -512,8 +511,8 @@ class mySSH:
                     return cmp_flag
         elif comp_flag=='EQUAL':
             for x in list:
-                logger.error('value of '+keyword+' is:'+x)
-                logger.error('comp_value is: '+comp_value)
+                log_print('value of '+keyword+' is:'+x)
+                log_print('comp_value is: '+comp_value)
                 if (x.strip()).isdigit() != 1:
                     #add by zhumingxing 20131227
                     if keyword == "MIB_Flag":
@@ -536,7 +535,7 @@ class mySSH:
 
     #value_comprae子函数，值比较
     def cmp_keep_value(self,list,comp_value,keyword,comp_flag,PreValue=''):
-        logger.error ('****************cmp_keep_value fuction')
+        log_print ('****************cmp_keep_value fuction')
         cmp_flag = True
         pre_flag = len(PreValue)
         if len(list)<=0:
@@ -547,9 +546,9 @@ class mySSH:
         if comp_flag=='BIG':
             for x in list:
                 self.value_now = x
-                logger.error('value of '+keyword+' is:'+x)
-                logger.error('comp_value is: '+comp_value)
-                logger.error('last time value  is: '+PreValue)
+                log_print('value of '+keyword+' is:'+x)
+                log_print('comp_value is: '+comp_value)
+                log_print('last time value  is: '+PreValue)
                 if float(x.strip()) - float(PreValue) > float(comp_value):
                     cmp_flag =False
                     self.error_NG ='NG  error: ' + keyword + ' get value ' + x.strip() +' is bigger then ' + comp_value
@@ -558,9 +557,9 @@ class mySSH:
         elif comp_flag=='SMALL':
             for x in list:
                 self.value_now = x
-                logger.error('value of '+keyword+' is:'+x)
-                logger.error('comp_value is: '+comp_value)
-                logger.error('last time value  is: '+PreValue)
+                log_print('value of '+keyword+' is:'+x)
+                log_print('comp_value is: '+comp_value)
+                log_print('last time value  is: '+PreValue)
                 if float(x.strip()) - float(PreValue) < float(comp_value):
                     cmp_flag = False
                     self.error_NG ='NG  error: ' + keyword + ' get value ' + x.strip() +' is smaller then ' + comp_value
@@ -569,9 +568,9 @@ class mySSH:
         elif comp_flag=='EQUAL':
             for x in list:
                 self.value_now = x
-                logger.error('comp_value is: '+comp_value)
-                logger.error('value of '+keyword+' is: '+x)
-                logger.error('last time value is:    '+PreValue)
+                log_print('comp_value is: '+comp_value)
+                log_print('value of '+keyword+' is: '+x)
+                log_print('last time value is:    '+PreValue)
                 if x.strip().isdigit() == 0:
                     if x.strip() != PreValue:
                         cmp_flag=False

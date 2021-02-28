@@ -1,6 +1,9 @@
 import unittest
 from src.framework.public import *
 import src.framework.api_test as api_test
+import src.framework.ssh_classs as ssh_class
+
+
 
 
 
@@ -10,6 +13,8 @@ class Get(unittest.TestCase):
 
     def setUp(self):
         log_print('Start to execute script :'+ os.path.abspath(__file__))
+        self.get=api_test.APITEST()
+        self.ssh_class = ssh_class.mySSH()
 
     def tearDown(self):
         log_print('Finish to execute script :'+ os.path.abspath(__file__))
@@ -17,6 +22,5 @@ class Get(unittest.TestCase):
     def test_001_001_01(self):
         tmpUrl = "https://oauth-api.cloud.huawei.com/rest.php"
         tmpParams = "nsp_svc=nsp.scope.app.get&appid=123456&type=2"
-        get=api_test.APITEST()
-        re=get.sendGet(tmpUrl,tmpParams)
+        re=self.get.sendGet(tmpUrl,tmpParams)
         self.assertEqual(re.status_code,200)
