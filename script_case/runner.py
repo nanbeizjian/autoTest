@@ -5,6 +5,7 @@ import os
 import logging
 #from HTMLTestRunner import HTMLTestRunner
 from src.framework.HTMLTestRunner import HTMLTestRunner
+from src.framework.MyConf import MyConf
 import shutil
 
 # 获取项目的根目录
@@ -14,6 +15,12 @@ work_dir=script_dir.split('script_case')[0]
 #创建当前报告目录
 current_report_dir=work_dir + '/report/' + now
 os.mkdir(current_report_dir)
+
+#初始化获取配置文件
+config_file = work_dir + '/config/config.ini'
+currentConfig = MyConf(config_file)
+print(currentConfig.get_str('bj','apiUrl'))
+
 
 
 
